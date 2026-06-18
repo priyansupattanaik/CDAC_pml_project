@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attrition Predictive Dashboard</title>
+    <meta name="description" content="An enterprise-grade employee attrition analysis and prediction portal powered by Random Forest + SMOTE.">
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for premium responsive charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fa-solid fa-users-gear"></i></div>
+                <h2>HR Analytics</h2>
+            </div>
+            <nav class="nav-links">
+                <button class="nav-btn active" id="btn-eda"><i class="fa-solid fa-chart-line"></i> EDA Dashboard</button>
+                <button class="nav-btn" id="btn-predict"><i class="fa-solid fa-wand-magic-sparkles"></i> Risk Predictor</button>
+                <button class="nav-btn" id="btn-model"><i class="fa-solid fa-microchip"></i> Model Architecture</button>
+            </nav>
+            <div class="sidebar-footer">
+                <p>Accuracy: <span>93.35%</span></p>
+                <p class="status-indicator"><span class="dot"></span> API Server Connected</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-info">
+                    <h1>Employee Attrition Portal</h1>
+                    <p>Analyze attrition triggers and predict turnover risk using state-of-the-art machine learning.</p>
+                </div>
+                <div class="header-actions">
+                    <span class="badge"><i class="fa-solid fa-shield-halved"></i> Active Security</span>
+                </div>
+            </header>
+
+            <!-- TAB 1: EDA DASHBOARD -->
+            <section class="content-tab active" id="tab-eda-content">
+                <div class="card-grid">
+                    <!-- Stat Card 1 -->
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-details">
+                            <h3>1,652</h3>
+                            <p>Total Records Analyzed</p>
+                        </div>
+                    </div>
+                    <!-- Stat Card 2 -->
+                    <div class="stat-card">
+                        <div class="stat-icon attr-icon"><i class="fa-solid fa-user-minus"></i></div>
+                        <div class="stat-details">
+                            <h3>396</h3>
+                            <p>Total Attritions ('Yes')</p>
+                        </div>
+                    </div>
+                    <!-- Stat Card 3 -->
+                    <div class="stat-card">
+                        <div class="stat-icon ret-icon"><i class="fa-solid fa-user-check"></i></div>
+                        <div class="stat-details">
+                            <h3>1,256</h3>
+                            <p>Total Retained ('No')</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid of Charts -->
+                <div class="charts-grid">
+                    <!-- Chart 1 -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-pie-chart"></i> Attrition Distribution</h3>
+                            <p>Proportion of stayed vs departed employees</p>
+                        </div>
+                        <div class="chart-body doughnut-body">
+                            <canvas id="chart-attrition-dist"></canvas>
+                        </div>
+                        <div class="chart-footer">
+                            <p><i class="fa-solid fa-info-circle"></i> Significant class imbalance, prompting the use of <strong>SMOTE</strong> oversampling during training to avoid bias.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2 -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-sitemap"></i> Attrition by Department</h3>
+                            <p>Turnover counts across corporate functions</p>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="chart-department-attr"></canvas>
+                        </div>
+                        <div class="chart-footer">
+                            <p><i class="fa-solid fa-info-circle"></i> Sales department shows the highest attrition rate (~30.6%), followed by R&D and HR.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 3 -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-clock"></i> Attrition by Overtime</h3>
+                            <p>How additional hours affect employee decisions</p>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="chart-overtime-attr"></canvas>
+                        </div>
+                        <div class="chart-footer">
+                            <p><i class="fa-solid fa-info-circle"></i> Overtime is a critical burnout trigger. 41.7% of employees working overtime eventually resign.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 4 -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-ring"></i> Attrition by Marital Status</h3>
+                            <p>Family commitments and mobility factors</p>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="chart-marital-attr"></canvas>
+                        </div>
+                        <div class="chart-footer">
+                            <p><i class="fa-solid fa-info-circle"></i> Single employees are substantially more mobile and susceptible to attrition (36.8%).</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 5 -->
+                    <div class="chart-card full-width">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-briefcase"></i> Attrition by Job Role</h3>
+                            <p>Departures mapped to specific occupational functions</p>
+                        </div>
+                        <div class="chart-body job-role-body">
+                            <canvas id="chart-job-role-attr"></canvas>
+                        </div>
+                        <div class="chart-footer">
+                            <p><i class="fa-solid fa-info-circle"></i> Sales Representatives (53.2%) and Laboratory Technicians (31.1%) show high attrition, while Managers (4.7%) are extremely stable.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart 6 -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fa-solid fa-scale-balanced"></i> Attrition by Work-Life Balance</h3>
+                            <p>1 = Best Work-Life Balance, 4 = Bad Work-Life Balance</p>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="chart-wlb-attr"></canvas>
+                        </div>
+                        <div class="chart-footer">
+                            <p><i class="fa-solid fa-info-circle"></i> Low work-life balance scores correlate perfectly with elevated employee resignation rates.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: RISK PREDICTOR -->
+            <section class="content-tab" id="tab-predict-content">
+                <div class="predictor-wrapper">
+                    <!-- Form Card -->
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h2><i class="fa-solid fa-id-card-clip"></i> Employee Feature Profiles</h2>
+                            <p>Fill out the profile metrics. All fields are required to calculate the exact attrition risk.</p>
+                        </div>
+                        <form id="prediction-form" class="prediction-grid">
+                            <!-- Group 1 -->
+                            <div class="form-group-card">
+                                <h3><i class="fa-solid fa-user-tie"></i> Role & Demographic Info</h3>
+                                
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="Age">Age</label>
+                                        <span class="slider-value" id="val-Age">35</span>
+                                    </div>
+                                    <input type="range" id="Age" name="Age" min="18" max="60" value="35" required oninput="document.getElementById('val-Age').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <label for="Gender">Gender</label>
+                                    <select id="Gender" name="Gender" required>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label for="MaritalStatus">Marital Status</label>
+                                    <select id="MaritalStatus" name="MaritalStatus" required>
+                                        <option value="Married">Married</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Divorced">Divorced</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label for="Department">Department</label>
+                                    <select id="Department" name="Department" required>
+                                        <option value="Research & Development">Research & Development</option>
+                                        <option value="Sales">Sales</option>
+                                        <option value="Human Resources">Human Resources</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <label for="JobRole">Job Role</label>
+                                    <select id="JobRole" name="JobRole" required>
+                                        <option value="Sales Executive">Sales Executive</option>
+                                        <option value="Research Scientist">Research Scientist</option>
+                                        <option value="Laboratory Technician">Laboratory Technician</option>
+                                        <option value="Manufacturing Director">Manufacturing Director</option>
+                                        <option value="Healthcare Representative">Healthcare Representative</option>
+                                        <option value="Manager">Manager</option>
+                                        <option value="Research Director">Research Director</option>
+                                        <option value="Sales Representative">Sales Representative</option>
+                                        <option value="Human Resources">Human Resources</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="JobLevel">Job Level (1 to 5)</label>
+                                        <span class="slider-value" id="val-JobLevel">2</span>
+                                    </div>
+                                    <input type="range" id="JobLevel" name="JobLevel" min="1" max="5" value="2" required oninput="document.getElementById('val-JobLevel').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <label for="BusinessTravel">Business Travel</label>
+                                    <select id="BusinessTravel" name="BusinessTravel" required>
+                                        <option value="Travel_Rarely">Travel_Rarely</option>
+                                        <option value="Travel_Frequently">Travel_Frequently</option>
+                                        <option value="Non-Travel">Non-Travel</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="DistanceFromHome">Distance From Home (miles)</label>
+                                        <span class="slider-value" id="val-DistanceFromHome">9</span>
+                                    </div>
+                                    <input type="range" id="DistanceFromHome" name="DistanceFromHome" min="1" max="29" value="9" required oninput="document.getElementById('val-DistanceFromHome').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <label for="EducationField">Education Field</label>
+                                    <select id="EducationField" name="EducationField" required>
+                                        <option value="Life Sciences">Life Sciences</option>
+                                        <option value="Medical">Medical</option>
+                                        <option value="Marketing">Marketing</option>
+                                        <option value="Technical Degree">Technical Degree</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Human Resources">Human Resources</option>
+                                    </select>
+                                </div>
+                            </div>
+ 
+                            <!-- Group 2 -->
+                            <div class="form-group-card">
+                                <h3><i class="fa-solid fa-hand-holding-dollar"></i> Compensation & Experience</h3>
+                                
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="MonthlyIncome">Monthly Income ($)</label>
+                                        <span class="slider-value" id="val-MonthlyIncome">6500</span>
+                                    </div>
+                                    <input type="range" id="MonthlyIncome" name="MonthlyIncome" min="1000" max="20000" step="100" value="6500" required oninput="document.getElementById('val-MonthlyIncome').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="DailyRate">Daily Rate ($)</label>
+                                        <span class="slider-value" id="val-DailyRate">800</span>
+                                    </div>
+                                    <input type="range" id="DailyRate" name="DailyRate" min="100" max="1500" value="800" required oninput="document.getElementById('val-DailyRate').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="HourlyRate">Hourly Rate ($)</label>
+                                        <span class="slider-value" id="val-HourlyRate">65</span>
+                                    </div>
+                                    <input type="range" id="HourlyRate" name="HourlyRate" min="30" max="100" value="65" required oninput="document.getElementById('val-HourlyRate').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="MonthlyRate">Monthly Rate ($)</label>
+                                        <span class="slider-value" id="val-MonthlyRate">14000</span>
+                                    </div>
+                                    <input type="range" id="MonthlyRate" name="MonthlyRate" min="2000" max="27000" value="14000" required oninput="document.getElementById('val-MonthlyRate').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="PercentSalaryHike">Percent Salary Hike (%)</label>
+                                        <span class="slider-value" id="val-PercentSalaryHike">15</span>
+                                    </div>
+                                    <input type="range" id="PercentSalaryHike" name="PercentSalaryHike" min="0" max="25" value="15" required oninput="document.getElementById('val-PercentSalaryHike').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="StockOptionLevel">Stock Option Level</label>
+                                        <span class="slider-value" id="val-StockOptionLevel">1</span>
+                                    </div>
+                                    <input type="range" id="StockOptionLevel" name="StockOptionLevel" min="0" max="3" value="1" required oninput="document.getElementById('val-StockOptionLevel').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="TotalWorkingYears">Total Working Years</label>
+                                        <span class="slider-value" id="val-TotalWorkingYears">10</span>
+                                    </div>
+                                    <input type="range" id="TotalWorkingYears" name="TotalWorkingYears" min="0" max="40" value="10" required oninput="document.getElementById('val-TotalWorkingYears').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="NumCompaniesWorked">Num Companies Worked</label>
+                                        <span class="slider-value" id="val-NumCompaniesWorked">2</span>
+                                    </div>
+                                    <input type="range" id="NumCompaniesWorked" name="NumCompaniesWorked" min="0" max="9" value="2" required oninput="document.getElementById('val-NumCompaniesWorked').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="YearsAtCompany">Years At Company</label>
+                                        <span class="slider-value" id="val-YearsAtCompany">5</span>
+                                    </div>
+                                    <input type="range" id="YearsAtCompany" name="YearsAtCompany" min="0" max="40" value="5" required oninput="document.getElementById('val-YearsAtCompany').textContent = this.value">
+                                </div>
+                            </div>
+ 
+                            <!-- Group 3 -->
+                            <div class="form-group-card">
+                                <h3><i class="fa-solid fa-face-smile"></i> Work Environment & Engagement</h3>
+                                
+                                <div class="input-field">
+                                    <label for="OverTime">Works Overtime?</label>
+                                    <select id="OverTime" name="OverTime" required>
+                                        <option value="No">No</option>
+                                        <option value="Yes">Yes</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="WorkLifeBalance">Work-Life Balance (1-4)</label>
+                                        <span class="slider-value" id="val-WorkLifeBalance">3</span>
+                                    </div>
+                                    <input type="range" id="WorkLifeBalance" name="WorkLifeBalance" min="1" max="4" value="3" required oninput="document.getElementById('val-WorkLifeBalance').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="JobSatisfaction">Job Satisfaction (1-4)</label>
+                                        <span class="slider-value" id="val-JobSatisfaction">2</span>
+                                    </div>
+                                    <input type="range" id="JobSatisfaction" name="JobSatisfaction" min="1" max="4" value="2" required oninput="document.getElementById('val-JobSatisfaction').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="EnvironmentSatisfaction">Environment Satisf. (1-4)</label>
+                                        <span class="slider-value" id="val-EnvironmentSatisfaction">2</span>
+                                    </div>
+                                    <input type="range" id="EnvironmentSatisfaction" name="EnvironmentSatisfaction" min="1" max="4" value="2" required oninput="document.getElementById('val-EnvironmentSatisfaction').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="RelationshipSatisfaction">Relationship Satisf. (1-4)</label>
+                                        <span class="slider-value" id="val-RelationshipSatisfaction">3</span>
+                                    </div>
+                                    <input type="range" id="RelationshipSatisfaction" name="RelationshipSatisfaction" min="1" max="4" value="3" required oninput="document.getElementById('val-RelationshipSatisfaction').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="JobInvolvement">Job Involvement (1-4)</label>
+                                        <span class="slider-value" id="val-JobInvolvement">2</span>
+                                    </div>
+                                    <input type="range" id="JobInvolvement" name="JobInvolvement" min="1" max="4" value="2" required oninput="document.getElementById('val-JobInvolvement').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <label for="PerformanceRating">Performance Rating (3 to 4)</label>
+                                    <select id="PerformanceRating" name="PerformanceRating" required>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="TrainingTimesLastYear">Training Times Last Year</label>
+                                        <span class="slider-value" id="val-TrainingTimesLastYear">2</span>
+                                    </div>
+                                    <input type="range" id="TrainingTimesLastYear" name="TrainingTimesLastYear" min="0" max="6" value="2" required oninput="document.getElementById('val-TrainingTimesLastYear').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="YearsInCurrentRole">Years In Current Role</label>
+                                        <span class="slider-value" id="val-YearsInCurrentRole">3</span>
+                                    </div>
+                                    <input type="range" id="YearsInCurrentRole" name="YearsInCurrentRole" min="0" max="18" value="3" required oninput="document.getElementById('val-YearsInCurrentRole').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="YearsSinceLastPromotion">Years Since Last Promotion</label>
+                                        <span class="slider-value" id="val-YearsSinceLastPromotion">1</span>
+                                    </div>
+                                    <input type="range" id="YearsSinceLastPromotion" name="YearsSinceLastPromotion" min="0" max="15" value="1" required oninput="document.getElementById('val-YearsSinceLastPromotion').textContent = this.value">
+                                </div>
+                                <div class="input-field">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <label for="YearsWithCurrManager">Years With Curr Manager</label>
+                                        <span class="slider-value" id="val-YearsWithCurrManager">3</span>
+                                    </div>
+                                    <input type="range" id="YearsWithCurrManager" name="YearsWithCurrManager" min="0" max="17" value="3" required oninput="document.getElementById('val-YearsWithCurrManager').textContent = this.value">
+                                </div>
+                            </div>
+ 
+                            <div class="btn-container">
+                                <button type="button" id="btn-random" class="submit-btn" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-dice"></i> Random Profile</button>
+                                <button type="submit" class="submit-btn"><i class="fa-solid fa-circle-nodes"></i> Calculate Attrition Risk</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Result Panel -->
+                    <div class="result-panel card" id="result-panel" style="display:none;">
+                        <div class="result-header">
+                            <h2>Prediction Report</h2>
+                            <p>Calculated dynamically from the Random Forest model.</p>
+                        </div>
+                        
+                        <div class="result-body">
+                            <!-- Class Badge -->
+                            <div class="risk-badge" id="risk-badge">LOW RISK</div>
+                            
+                            <!-- Gauge -->
+                            <div class="gauge-container">
+                                <div class="circular-progress" id="progress-circle">
+                                    <span class="progress-value" id="progress-val">0%</span>
+                                </div>
+                                <h4>Attrition Risk Probability</h4>
+                            </div>
+
+                            <!-- Recommendations -->
+                            <div class="recommendations-box">
+                                <h3><i class="fa-solid fa-list-check"></i> Tactical Retention Steps</h3>
+                                <ul id="rec-list">
+                                    <!-- Dynamic list -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MODEL SPECIFICATIONS -->
+            <section class="content-tab" id="tab-model-content">
+                <div class="model-spec-container">
+                    <div class="model-spec-card card">
+                        <h2><i class="fa-solid fa-microchip"></i> Machine Learning Pipeline</h2>
+                        <p>Our model represents a robust machine learning architecture designed to handle severe class imbalances without losing prediction accuracy.</p>
+                        
+                        <div class="spec-flow">
+                            <div class="flow-step">
+                                <h4><i class="fa-solid fa-shield-virus"></i> 1. Class Balancing</h4>
+                                <p><strong>SMOTE (Synthetic Minority Over-sampling Technique)</strong> synthesized new attrition records, increasing representation of minority classes and preventing bias.</p>
+                            </div>
+                            <div class="flow-step">
+                                <h4><i class="fa-solid fa-scale-unbalanced-flip"></i> 2. Feature Scaling</h4>
+                                <p>A <strong>StandardScaler</strong> scaling algorithm centers all 29 numerical features to mean=0 and variance=1 inside the predictive pipeline.</p>
+                            </div>
+                            <div class="flow-step">
+                                <h4><i class="fa-solid fa-tree"></i> 3. Random Forest Classifier</h4>
+                                <p>An ensemble model of 100 individual decision trees trained on the scaled, resampled data. Predicts with premium mathematical certainty.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-card-full card">
+                        <h2><i class="fa-solid fa-square-poll-vertical"></i> Pipeline Evaluation Summary</h2>
+                        <table class="metrics-table">
+                            <thead>
+                                <tr>
+                                    <th>Model Name</th>
+                                    <th>Accuracy</th>
+                                    <th>Precision</th>
+                                    <th>Recall (Sensitivity)</th>
+                                    <th>F1-Score</th>
+                                    <th>ROC AUC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Logistic Regression (Before SMOTE)</td>
+                                    <td>81.57%</td>
+                                    <td>63.91%</td>
+                                    <td>55.67%</td>
+                                    <td>63.91%</td>
+                                    <td>83.83%</td>
+                                </tr>
+                                <tr>
+                                    <td>Decision Tree (Before SMOTE)</td>
+                                    <td>76.74%</td>
+                                    <td>52.76%</td>
+                                    <td>44.33%</td>
+                                    <td>52.76%</td>
+                                    <td>75.97%</td>
+                                </tr>
+                                <tr class="highlighted-row">
+                                    <td><strong>Random Forest + SMOTE (Best Model)</strong></td>
+                                    <td><strong>93.35%</strong></td>
+                                    <td><strong>88.04%</strong></td>
+                                    <td><strong>83.51%</strong></td>
+                                    <td><strong>88.04%</strong></td>
+                                    <td><strong>96.69%</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>XGBoost + SMOTE</td>
+                                    <td>91.54%</td>
+                                    <td>85.11%</td>
+                                    <td>82.47%</td>
+                                    <td>85.11%</td>
+                                    <td>95.93%</td>
+                                </tr>
+                                <tr>
+                                    <td>SVM + SMOTE</td>
+                                    <td>85.50%</td>
+                                    <td>75.76%</td>
+                                    <td>77.32%</td>
+                                    <td>75.76%</td>
+                                    <td>90.36%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="spec-notes">
+                            <p><i class="fa-solid fa-circle-check"></i> <strong>Key Takeaway:</strong> Oversampling with SMOTE drastically improved the recall rate (from 78.35% to 83.51% for Random Forest), meaning our model catches almost all employees at risk of leaving, rather than only predicting 'No Attrition' conservatively.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
