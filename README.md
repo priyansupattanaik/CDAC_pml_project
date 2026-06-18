@@ -6,6 +6,26 @@ Machine learning system that predicts employee attrition risk using a **Random F
 
 ---
 
+## System Workflow
+
+End-to-end architecture: data preprocessing and ML pipeline on the left, Flask backend and triple-interface deployment on the right.
+
+<p align="center">
+  <img src="HR_Attrition_Prediction_System_Workflow.png" alt="HR Attrition Prediction: End-to-End System Workflow — Data Engineering, Random Forest + SMOTE (93.35% accuracy), Flask API, HTML Dashboard, Streamlit App, and Rule-Based HR Recommendations" width="900">
+</p>
+
+<p align="center"><em>Figure: HR Attrition Prediction System — from 1,652 employee records through SMOTE-balanced Random Forest to Flask API, HTML/Streamlit interfaces, and automated retention recommendations.</em></p>
+
+| Stage | Components |
+|---|---|
+| **Data Engineering** | Duplicate removal, null imputation, 29-feature profiling |
+| **ML Pipeline** | SMOTE class balancing → StandardScaler → Random Forest (`93.35%` accuracy) |
+| **Backend** | Flask REST API — `/predict`, `/api/eda`, `/health` |
+| **Interfaces** | HTML dashboard (`index.html`), Streamlit app (`app_streamlit.py`), raw REST API |
+| **Output** | Attrition probability + rule-based HR recommendations |
+
+---
+
 ## Features
 
 - **Exploratory Data Analysis (EDA)** — attrition trends by department, overtime, job role, marital status, and work-life balance
@@ -31,6 +51,7 @@ CDAC_pml_project/
 ├── HR_Attrition.csv             # Source dataset (1749 rows, 35 columns)
 ├── full_finalcodemlproject.ipynb # Original ML notebook (EDA, model comparison)
 ├── PROJECT_DOCUMENTATION.md     # Full technical documentation
+├── HR_Attrition_Prediction_System_Workflow.png  # System architecture diagram
 ├── requirements.txt             # Python dependencies
 ├── HR_Attrition_Project_Explanation.pdf
 └── Ultimate_HR_Attrition_Project_Viva_Handbook.pdf
